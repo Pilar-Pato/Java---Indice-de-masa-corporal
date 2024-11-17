@@ -5,103 +5,112 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class CalculadoraIMCTest {
 
+    
     @Test
-    public void testCalcularIMC_PesoNormal() {
-        
+    public void testCalcularIMC_PesoYAlturaPositivos() {
         CalculadoraIMC calculadora = new CalculadoraIMC();
+
+        
+        double peso = 70;
+        double altura = 1.75;
+        double resultadoEsperado = 70 / Math.pow(1.75, 2); // IMC = 22.8571...
+        assertEquals(resultadoEsperado, calculadora.calcularIMC(peso, altura), 0.0001);
+
+        
+        peso = 50;
+        altura = 1.60;
+        resultadoEsperado = 50 / Math.pow(1.60, 2); // IMC = 19.5312...
+        assertEquals(resultadoEsperado, calculadora.calcularIMC(peso, altura), 0.0001);
+
        
-        double peso = 70.0;
-        double altura = 1.8;
-        double imc = calculadora.calcularIMC(peso, altura);
-        double expectedIMC = 21.6;
-        assertEquals(expectedIMC, imc, 0.01);  
+        peso = 100;
+        altura = 1.80;
+        resultadoEsperado = 100 / Math.pow(1.80, 2); // IMC = 30.8641...
+        assertEquals(resultadoEsperado, calculadora.calcularIMC(peso, altura), 0.0001);
     }
 
+   
     @Test
-    public void testCalcularIMC_DelgadezS() {
+    public void testCalcularIMC_ExcepcionesPesoYAlturaNoPositivos() {
+        CalculadoraIMC calculadora = new CalculadoraIMC();
+
+       
+        assertThrows(IllegalArgumentException.class, () -> {
+            calculadora.calcularIMC(-1, 1.75);
+        });
+
         
-        CalculadoraIMC calculadora = new CalculadoraIMC();
-        double peso = 40.0;
-        double altura = 1.7;
-        double expectedIMC = 13.84;
-        assertEquals(expectedIMC, calculadora.calcularIMC(peso, altura), 0.01);
-    }
-    @Test
-    public void testCalcularIMC_DelgadezM() {
-        CalculadoraIMC calculadora = new CalculadoraIMC();
-        double peso = 45.0;
-        double altura = 1.7;
-        double expectedIMC = 15.57;
-        assertEquals(expectedIMC, calculadora.calcularIMC(peso, altura), 0.01);
-    }
-
-    @Test
-    public void testCalcularIMC_DelgadezL() {
-        CalculadoraIMC calculadora = new CalculadoraIMC();
-        double peso = 55.0;
-        double altura = 1.7;
-        double expectedIMC = 19.04;
-        assertEquals(expectedIMC, calculadora.calcularIMC(peso, altura), 0.01);
-    }
-
-    @Test
-    public void testCalcularIMC_Sobrepeso() {
-        CalculadoraIMC calculadora = new CalculadoraIMC();
-        double peso = 76.0;
-        double altura = 1.7;
-        double expectedIMC = 26.29;
-        assertEquals(expectedIMC, calculadora.calcularIMC(peso, altura), 0.01);
-    }
-
-    @Test
-    public void testCalcularIMC_ObesidadL() {
-        CalculadoraIMC calculadora = new CalculadoraIMC();
-        double peso = 85.0;
-        double altura = 1.7;
-        double expectedIMC = 29.41;
-        assertEquals(expectedIMC, calculadora.calcularIMC(peso, altura), 0.01);
-    }
-
-    @Test
-    public void testCalcularIMC_ObesidadM() {
-        CalculadoraIMC calculadora = new CalculadoraIMC();
-        double peso = 120.0;
-        double altura = 1.6;
-        double expectedIMC = 46.88;
-        assertEquals(expectedIMC, calculadora.calcularIMC(peso, altura), 0.01);
-    }
-    @Test
-    public void testCalcularIMC_PesoNega() {
-        CalculadoraIMC calculadora = new CalculadoraIMC();
         assertThrows(IllegalArgumentException.class, () -> {
-            calculadora.calcularIMC(-5, 1.7);
+            calculadora.calcularIMC(70, -1.75);
         });
-    }
 
-    @Test
-    public void testCalcularIMC_AlturaNeg() {
-        CalculadoraIMC calculadora = new CalculadoraIMC();
+        
         assertThrows(IllegalArgumentException.class, () -> {
-            calculadora.calcularIMC(70, -1.7);
+            calculadora.calcularIMC(0, 1.75);
+        });
+
+        
+        assertThrows(IllegalArgumentException.class, () -> {
+            calculadora.calcularIMC(70, 0);
+        });
+
+        
+        assertThrows(IllegalArgumentException.class, () -> {
+            calculadora.calcularIMC(0, 0);
         });
     }
 
+    
     @Test
-    public void testCalcularIMC_ExceptionPeso() {
+    public void testClasificacionIMC() {
         CalculadoraIMC calculadora = new CalculadoraIMC();
-        assertThrows(NumberFormatException.class, () -> {
-            // Simulamos una excepción de formato al intentar convertir una cadena a double
-            double peso = Double.parseDouble("h");
-            calculadora.calcularIMC(peso, 1.7);
-        });
+
+        
+        double imc = 15.5;
+        assertEquals("Delgadez severa", calculadora.clasificacionIMC(imc));
+
+        
+        imc = 16.5;
+        assertEquals("Delgadez moderada", calculadora.clasificacionIMC(imc));
+
+        
+        imc = 17.5;
+        assertEquals("Delgadez", calculadora.clasificacionIMC(imc));
+
+        
+        imc = 22.0;
+        assertEquals("Peso normal", calculadora.clasificacionIMC(imc));
+
+        
+        imc = 28.0;
+        assertEquals("Sobrepeso", calculadora.clasificacionIMC(imc));
+
+        
+        imc = 32.0;
+        assertEquals("Obesidad leve", calculadora.clasificacionIMC(imc));
+
+        
+        imc = 36.0;
+        assertEquals("Obesidad moderada", calculadora.clasificacionIMC(imc));
+
+        
+        imc = 42.0;
+        assertEquals("Obesidad morbida", calculadora.clasificacionIMC(imc));
     }
 
+   
     @Test
-    public void testCalcularIMC_ExceptionAltura() {
+    public void testClasificacionIMC_ExcepcionesIMCNoPositivo() {
         CalculadoraIMC calculadora = new CalculadoraIMC();
-        assertThrows(NumberFormatException.class, () -> {
-        double altura = Double.parseDouble("m");
-        calculadora.calcularIMC(70, altura);
-    });
-}
+
+       
+        assertThrows(IllegalArgumentException.class, () -> {
+            calculadora.clasificacionIMC(-5);
+        });
+
+        
+        assertThrows(IllegalArgumentException.class, () -> {
+            calculadora.clasificacionIMC(0);
+        });
+    }
 }
